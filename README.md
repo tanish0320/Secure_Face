@@ -1,6 +1,6 @@
-# SecureFace Edge AI - Backend & AI Integration
+# Blitz - Backend & AI Integration
 
-SecureFace Edge AI is a production-grade, offline-first facial recognition attendance system built with React Native and TypeScript. It features a hardened security layer, transactional data synchronization, and an advanced behavioral biometrics pipeline.
+Blitz is a production-grade, offline-first facial recognition attendance system built with React Native and TypeScript. It features a hardened security layer, transactional data synchronization, and an advanced behavioral biometrics pipeline.
 
 ## 🚀 Key Features
 
