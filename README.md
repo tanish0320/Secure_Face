@@ -137,8 +137,8 @@ Ensure your environment is set up for React Native development:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/AdithyaK3106/SecureFace-EdgeAI.git
-   cd SecureFace-EdgeAI
+   git clone https://github.com/tanish0320/Secure_Face.git
+   cd Secure_Face
    ```
 
 2. **Install Dependencies**
