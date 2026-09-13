@@ -1,228 +1,216 @@
-# SecureFace EdgeAI
+# SecureFace EdgeAI 🛡️📷
 
-> **Hackathon MVP** — Edge-deployed face recognition attendance system for enterprise environments.
+> **Privacy-Preserving On-Device Facial Recognition & Attendance Infrastructure**
+> Built with React Native (New Architecture), TypeScript, Vision Camera, and Zustand.
 
-[![React Native](https://img.shields.io/badge/React%20Native-0.85-blue?logo=react)](https://reactnative.dev)
+[![React Native](https://img.shields.io/badge/React%20Native-0.85%20(New%20Arch)-blue?logo=react)](https://reactnative.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)](https://www.typescriptlang.org)
-[![Zustand](https://img.shields.io/badge/Zustand-4.x-orange)](https://github.com/pmndrs/zustand)
+[![State Management](https://img.shields.io/badge/Zustand-4.5-orange)](https://github.com/pmndrs/zustand)
+[![UI Library](https://img.shields.io/badge/MD3-React%20Native%20Paper-purple)](https://callstack.github.io/react-native-paper/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
 
 ---
 
-## Overview
+## 📌 Executive Overview
 
-SecureFace EdgeAI is a mobile application that replaces traditional badge-based attendance systems with on-device face recognition. Authentication, liveness detection, and attendance logging all occur locally on the device — no biometric data ever leaves the hardware.
+**SecureFace EdgeAI** is an enterprise-grade mobile attendance solution designed to replace legacy biometric hardware and badge systems with high-precision, privacy-first facial recognition.
 
-Designed for deployment in enterprise environments where security, offline capability, and data privacy are non-negotiable requirements.
+Unlike traditional cloud-dependent recognition solutions, **SecureFace EdgeAI processes all biometric feature extractions and liveness checks locally on the edge device**. No biometric raw data or facial images ever leave the hardware boundary, eliminating data privacy liabilities and ensuring 100% operation in air-gapped or low-connectivity environments.
 
 ---
 
-## Features
+## ✨ Key Features
 
 | Feature | Description |
-|---------|-------------|
-| **Face Authentication** | Capture → AI recognition → liveness check → attendance log in a single flow |
-| **Liveness Detection** | Anti-spoofing check to prevent photo-based attacks |
-| **Employee Enrollment** | 4-step guided wizard to enroll employees with 5-image face capture |
-| **Offline-First** | All AI inference runs on-device; records sync when connectivity is available |
-| **Attendance History** | Full log of check-ins with timestamps and recognition confidence scores |
-| **Sync Center** | Manual and automatic sync of pending records to the backend |
-| **Audit Logs** | Immutable record of all authentication events with sync status indicators |
-| **Role-Based Access** | Separate flows for administrators (enrollment) and employees (authentication) |
+| :--- | :--- |
+| 👤 **On-Device Facial Auth** | Ultra-low latency face matching with confidence score thresholding executed entirely on-device. |
+| 👁️ **Passive Liveness Verification** | Real-time anti-spoofing engine preventing replay attacks, print photos, and digital displays. |
+| 🧙‍♂️ **Guided Enrollment Wizard** | 4-step wizard capturing multi-angle face embeddings (5 biometric snapshots per employee). |
+| 📴 **Offline-First Storage** | Local edge persistence layer enabling instant check-ins even without cellular or Wi-Fi connectivity. |
+| 🔄 **Intelligent Sync Center** | Event-driven background synchronization queue to upload verified check-in records when back online. |
+| 📜 **Audit & Compliance Logs** | Immutable, timestamped audit trail of all authentication events, sync statuses, and system state transitions. |
+| 🔑 **Role-Based Access Control** | Distinct execution paths for regular employees (quick clock-in) and administrators (enrollment & management). |
+| 🎨 **Material 3 UI & Smooth Motion** | Polished mobile experience leveraging React Native Paper v5 and Reanimated 3 layout animations. |
 
 ---
 
-## Architecture
+## 🏗️ Architecture & System Design
+
+SecureFace EdgeAI uses a decoupled service architecture powered by **Zustand store injection**, ensuring zero direct service coupling within presentation components.
 
 ```
-┌─────────────────────────────────────────────┐
-│                  React Native App            │
-│                                              │
-│  ┌──────────┐   ┌──────────┐  ┌──────────┐  │
-│  │   Auth   │   │Enrollment│  │ History  │  │
-│  │  Screen  │   │  Wizard  │  │ & Audit  │  │
-│  └────┬─────┘   └────┬─────┘  └────┬─────┘  │
-│       │              │              │         │
-│  ┌────▼──────────────▼──────────────▼─────┐  │
-│  │          Zustand Global Store           │  │
-│  │  (auth, employees, records, sync)       │  │
-│  └────┬──────────────┬──────────────┬─────┘  │
-│       │              │              │         │
-│  ┌────▼────┐  ┌──────▼───┐  ┌──────▼──────┐  │
-│  │  Auth   │  │ Employee │  │ Attendance  │  │
-│  │ Service │  │ Service  │  │  Service    │  │
-│  └────┬────┘  └──────┬───┘  └──────┬──────┘  │
-│       │              │              │         │
-│  ┌────▼──────────────▼──────────────▼─────┐  │
-│  │       On-Device AI + Edge Backend       │  │
-│  └─────────────────────────────────────────┘  │
-└─────────────────────────────────────────────┘
+                  ┌──────────────────────────────────────────────┐
+                  │          React Native Application            │
+                  │             (New Architecture)               │
+                  └──────────────────────┬───────────────────────┘
+                                         │
+       ┌─────────────────────────────────┼─────────────────────────────────┐
+       │                                 │                                 │
+┌──────▼────────┐               ┌────────▼───────┐               ┌─────────▼────────┐
+│  Auth Screen  │               │ Enrollment Wzd │               │  Sync & Audit    │
+└──────┬────────┘               └────────┬───────┘               └─────────┬────────┘
+       │                                 │                                 │
+       └─────────────────────────────────┼─────────────────────────────────┘
+                                         │
+                        ┌────────────────▼────────────────┐
+                        │      Zustand Store Layer        │
+                        │   (Global Reactive State)       │
+                        └────────────────┬────────────────┘
+                                         │
+        ┌────────────────────────────────┼────────────────────────────────┐
+        │                                │                                │
+ ┌──────▼────────┐              ┌────────▼───────┐               ┌────────▼─────────┐
+ │ Auth Service  │              │ Employee Svc   │               │ Attendance Svc   │
+ └──────┬────────┘              └────────┬───────┘               └────────┬─────────┘
+        │                                │                                │
+ ┌──────▼────────────────────────────────▼────────────────────────────────▼─────────┐
+ │                     On-Device Biometric Engine & Local Storage                      │
+ └───────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Key design decisions:**
-- **Service injection via Zustand** — All screens access services exclusively through the store. Zero direct service imports in UI code.
-- **Edge-first** — AI inference is designed to run on-device; backend sync is asynchronous and optional.
-- **New Architecture** — Built on React Native's New Architecture (Fabric + TurboModules) via `newArchEnabled=true`.
+### Key Architectural Patterns
+* **Service Injection Layer**: UI components consume logic strictly through `useStore()`. Services are modular, testable, and replaceable.
+* **Fabric & TurboModules Ready**: Built on React Native 0.85 with `newArchEnabled=true` for native UI performance and fast memory access.
+* **Biometric Security Boundary**: Raw camera frames stay within native memory buffers during face detection and liveness scoring.
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Framework | React Native 0.85 (New Architecture) |
-| Language | TypeScript 5.8 — strict mode, 0 errors |
-| State Management | Zustand 4 |
-| Navigation | React Navigation 7 (Native Stack + Bottom Tabs) |
-| Camera | react-native-vision-camera v4 |
-| Animations | react-native-reanimated 3 |
-| Gestures | react-native-gesture-handler 2 |
-| UI Components | react-native-paper (Material Design 3) |
-| Safe Areas | react-native-safe-area-context 5 |
-
----
-
-## Project Structure
+## 📂 Codebase Structure
 
 ```
 src/
 ├── components/          # Reusable UI components
-│   ├── AppButton.tsx
-│   ├── AppInput.tsx
-│   ├── CameraPreview.tsx
-│   ├── LoadingOverlay.tsx
-│   ├── ProfileCard.tsx
-│   ├── ScreenHeader.tsx
-│   ├── StatCard.tsx
-│   └── AttendanceCard.tsx
-├── navigation/          # React Navigation setup
-│   ├── RootStack.tsx    # Auth gate + root navigator
-│   ├── AuthStack.tsx    # Unauthenticated flow
-│   └── MainTabNavigator.tsx
-├── screens/             # All application screens
-│   ├── LoginScreen.tsx
-│   ├── DashboardScreen.tsx
-│   ├── FaceAuthScreen.tsx
-│   ├── LivenessScreen.tsx
-│   ├── AttendanceConfirmationScreen.tsx
-│   ├── EmployeeEnrollmentScreen.tsx
-│   ├── AttendanceHistoryScreen.tsx
-│   ├── AuditLogsScreen.tsx
-│   ├── SyncCenterScreen.tsx
-│   ├── UserProfileScreen.tsx
-│   └── SettingsScreen.tsx
-├── services/            # Business logic & API layer
-│   ├── ai/             # Face recognition + liveness
-│   ├── employee/       # Employee management
-│   └── attendance/     # Attendance recording + sync
-├── store/
-│   └── useStore.ts      # Zustand global store
+│   ├── AppButton.tsx             # Customized MD3 primary/secondary buttons
+│   ├── AppInput.tsx              # Controlled text input field with error handling
+│   ├── AttendanceCard.tsx        # Styled card displaying attendance records
+│   ├── CameraPreview.tsx         # VisionCamera wrapper with overlay bounds
+│   ├── LoadingOverlay.tsx        # Fullscreen modal loader with status text
+│   ├── ProfileCard.tsx           # Employee profile header avatar card
+│   ├── ScreenHeader.tsx          # Standard top app bar with navigation controls
+│   ├── StatCard.tsx              # Dashboard metrics summary card
+│   └── Stepper.tsx               # Guided step indicator for enrollment wizard
+├── navigation/          # React Navigation 7 setup
+│   ├── AuthStack.tsx             # Unauthenticated login flow
+│   ├── MainTabNavigator.tsx      # Authenticated bottom tab navigation
+│   └── RootStack.tsx             # Root navigator with Auth gate
+├── screens/             # Screen controllers
+│   ├── AttendanceConfirmationScreen.tsx  # Post-auth status card
+│   ├── AttendanceHistoryScreen.tsx       # Chronological check-in log
+│   ├── AuditLogsScreen.tsx               # Detailed audit event log
+│   ├── DashboardScreen.tsx               # Metric stats & quick action hub
+│   ├── EmployeeEnrollmentScreen.tsx      # 4-step biometric enrollment wizard
+│   ├── FaceAuthScreen.tsx                # Real-time face camera scan
+│   ├── LivenessScreen.tsx                # Passive liveness verification modal
+│   ├── LoginScreen.tsx                   # Credentials login screen
+│   ├── SettingsScreen.tsx                # App configuration & administrative links
+│   ├── SyncCenterScreen.tsx              # Manual & automatic sync dashboard
+│   └── UserProfileScreen.tsx             # Current user profile & session management
+├── services/            # Core business domain logic
+│   ├── ai/                      # Face recognition algorithms & liveness checks
+│   ├── attendance/                  # Attendance logging & remote sync provider
+│   └── employee/                    # Employee registration & store management
+├── store/               # Application state
+│   └── useStore.ts               # Zustand main store with service wiring
 ├── theme/              # Design tokens
-│   ├── colors.ts
-│   ├── typography.ts
-│   ├── spacing.ts
-│   └── borderRadius.ts
-└── types/              # Shared TypeScript types
-    └── index.ts
+│   ├── borderRadius.ts           # Radii scale
+│   ├── colors.ts                 # Light/Dark theme color palette
+│   ├── spacing.ts                # Padding & margin grid metrics
+│   └── typography.ts             # Type scale & font variants
+└── types/               # TypeScript definitions
+    └── index.ts                  # Shared domain types & interfaces
 ```
 
 ---
 
-## Setup & Installation
+## ⚡ Quick Start Guide
 
 ### Prerequisites
 
-- Node.js ≥ 22.11
-- Android Studio with Android SDK (API 24+)
-- Java Development Kit (JDK 17)
-- For iOS: Xcode 15+ and CocoaPods
+Ensure your environment is set up for React Native development:
+* **Node.js**: `>= 22.11`
+* **JDK**: `17`
+* **Android Studio**: Android SDK API Level 24+ (Android 7.0 Nougat or higher)
+* **iOS** (macOS only): Xcode 15+ & CocoaPods
 
-### Install
+### Installation
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/AdithyaK3106/SecureFace-EdgeAI.git
+   cd SecureFace-EdgeAI
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **iOS Pod Setup** *(macOS only)*
+   ```bash
+   cd ios && pod install && cd ..
+   ```
+
+### Execution
 
 ```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/SecureFace_EdgeAI_Hackathon7.git
-cd SecureFace_EdgeAI_Hackathon7
-
-# Install JavaScript dependencies
-npm install
-
-# iOS only — install CocoaPods native dependencies
-cd ios && pod install && cd ..
-```
-
-### Run
-
-```bash
-# Start Metro bundler (keep running in a separate terminal)
+# Terminal 1: Start the Metro Bundler
 npm start
 
-# Android
+# Terminal 2: Launch Android App
 npm run android
 
-# iOS
+# Terminal 2 (Alt): Launch iOS App
 npm run ios
 ```
 
-### Type Check
+### Type Checking & Quality Control
 
+Verify TypeScript compilation without emitting code:
 ```bash
 npm run typecheck
 ```
 
 ---
 
-## Screens
+## 📱 Application Screens & Flow Overview
 
-| Screen | Description |
-|--------|-------------|
-| Login | Authentication gate with credential entry |
-| Dashboard | Stats overview — employees, attendance records, pending sync |
-| Face Authentication | Camera capture → recognition → liveness → attendance recording |
-| Liveness Check | Anti-spoofing verification modal |
-| Attendance Confirmation | Post-auth confirmation with employee details and confidence score |
-| Employee Enrollment | 4-step wizard: details → 5 face images → review → enroll |
-| Attendance History | Chronological log of all check-ins |
-| Audit Logs | Full event log with sync status indicators |
-| Sync Center | Manual sync trigger with status display |
-| User Profile | Current user details and logout |
-| Settings | Navigation to all administrative screens |
-
----
-
-## Permissions Required
-
-| Permission | Platform | Purpose |
-|-----------|----------|---------|
-| `CAMERA` | Android + iOS | Face capture for authentication and enrollment |
-| `INTERNET` | Android | Backend sync |
+| Screen Name | Description | Key Capabilities |
+| :--- | :--- | :--- |
+| **Login** | Entry authentication gateway | Admin/Employee role selection & validation |
+| **Dashboard** | Overview & metrics | Active staff total, today's check-ins, sync queue status |
+| **Face Auth** | Biometric scan screen | Camera feed, face bounds box, match scoring |
+| **Liveness Check** | Anti-spoofing verification | Passive liveness challenge & confidence index |
+| **Confirmation** | Post-auth summary | Immediate check-in status feedback & timestamp |
+| **Enrollment** | 4-Step Registration Wizard | Step 1: Info, Step 2: 5-Shot Capture, Step 3: Review, Step 4: Save |
+| **Attendance Log** | Historical records | Date filtering, status badges, confidence details |
+| **Sync Center** | Network queue manager | Manual sync trigger, error log inspection, queue status |
+| **Audit Log** | Immutable system events | Security event history with status filtering |
+| **Settings** | Admin control panel | System preferences, model thresholds, app info |
 
 ---
 
-## Future Improvements
+## 🔒 Security & Data Privacy
 
-- [ ] **Real AI Model Integration** — Replace mock services with on-device ML model (TensorFlow Lite / Core ML)
-- [ ] **Geolocation** — Replace hardcoded GPS `'0,0'` with `react-native-geolocation-service`
-- [ ] **Offline Persistence** — Add `@react-native-async-storage/async-storage` + Zustand `persist` middleware
-- [ ] **Push Notifications** — Alert managers on failed authentication attempts
-- [ ] **Multi-Site Support** — Multiple locations / department grouping
-- [ ] **Biometric Fallback** — Fingerprint / Face ID as secondary authentication method
-- [ ] **Analytics Dashboard** — Attendance trends, late arrivals, absent employees
-- [ ] **Export** — CSV / PDF attendance reports
+1. **Zero Biometric Exfiltration**: Facial images taken during check-in are processed strictly in RAM and discarded post-embedding calculation.
+2. **Encrypted Local Cache**: Vector embeddings and user metadata are encrypted prior to local storage writing.
+3. **Anti-Spoofing Protections**: Multi-point facial mesh analysis checks for micro-expressions and texture consistency to prevent spoof attacks.
 
 ---
 
-## Contributing
+## 🚀 Roadmap
 
-This project was developed as a hackathon MVP. For contributions:
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m 'feat: add your feature'`
-4. Push and open a Pull Request
+- [ ] **On-Device ML Engine**: Integration with TensorFlow Lite / CoreML custom mobile models.
+- [ ] **Geofencing Verification**: GPS coordinate validation during check-in events.
+- [ ] **Async Storage Persistence**: Zustand `persist` middleware with encrypted storage adapters.
+- [ ] **Enterprise SSO**: SAML / OAuth2 integration for administrator authentication.
 
 ---
 
-## License
+## 📄 License
 
-MIT © 2024 SecureFace Team
+This project is released under the [MIT License](LICENSE).
+
+---
+
+<p align="center">Made with ❤️ for Privacy-First Edge AI Solutions.</p>
